@@ -3,19 +3,19 @@ const faunadb = require("faunadb"),
   q = faunadb.query;
 const handler = async (event) => {
   try {
-    var client = new faunadb.Client({
+    const reqObj = JSON.parse(event.body);
+    let client = new faunadb.Client({
       secret: "fnAD_y7JvQACB7xMLYgv_6je4PKIMCuhOG1g4vaY",
     });
-    var result = await client.query(
-      // q.Get(q.Ref(q.Collection("FirstCrud"), "287806439297122823"))
-      q.Map(
-        q.Paginate(q.Documents(q.Collection("FirstCrud"))),
-        q.Lambda((x) => q.Get(x))
-      )
+
+    const result = await client.query(
+      q.Update(q.Ref(q.Collection("FirstCrud"), reqObj.id), {
+        data: { title: reqObj.title },
+      })
     );
     return {
       statusCode: 200,
-      body: JSON.stringify(result.data),
+      body: JSON.stringify(result),
       // // more keys you can return:
       // headers: { "headerName": "headerValue", ... },
       // isBase64Encoded: true,
